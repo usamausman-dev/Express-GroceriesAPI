@@ -25,8 +25,13 @@ const getAllCategories = async (req, res) => {
 
 const getCategoryByID = async (req, res) => {
 
-    try {
+    const { _id } = req.query
 
+
+    try {
+        await connect(process.env.MONGO_URI)
+        const category = await Category.findOne({ _id })
+        res.json({ category })
     }
 
 
@@ -80,8 +85,24 @@ const createCategory = async (req, res) => {
 }
 
 const updateCategory = async (req, res) => {
+    const { _id, CategoryName, CategoryImage } = req.body
+
+    const filter = { _id };
+    const update = { CategoryName, CategoryImage };
 
     try {
+        await connect(process.env.MONGO_URI)
+
+        await Category.findOneAndUpdate(filter, update, {
+            new: true
+        });
+
+        const category = await Category.find()
+
+        res.json({
+            message: "Success",
+            category
+        })
 
     }
 
@@ -96,8 +117,17 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
 
-    try {
+    const { _id } = req.body
 
+
+    try {
+        await connect(process.env.MONGO_URI)
+        await Category.deleteOne({ _id })
+        const category = await Category.find()
+        res.status(200).json({
+            message: "Deleted Successfully",
+            category
+        })
     }
 
 
